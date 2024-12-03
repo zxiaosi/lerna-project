@@ -14,3 +14,16 @@ export const layout = () => {
     },
   };
 };
+
+export const qiankun = {
+  apps: [
+    {
+      name: 'demo1',
+      entry: '//localhost:8001',
+    },
+    {
+      name: 'demo2',
+      entry: '//localhost:8002',
+    },
+  ],
+};
