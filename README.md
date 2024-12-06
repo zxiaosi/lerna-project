@@ -1,5 +1,16 @@
 ## lerna8 + pnpm + workspaces + vite
 
+### 问题
+
+- `node` 版本小于 `18`, 安装 `vite-plugin-qiankun` 后启动会报错
+
+- 解决方案：更改 `cheerio` 的版本, 详见：[cheerio upgrade problem](https://github.com/cheeriojs/cheerio/issues/4024)
+
+  ```bash
+  # 在项目目录下执行
+  npm i cheerio@1.0.0-rc.12
+  ```
+
 ### 常用命令
 
 ```bash
