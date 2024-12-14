@@ -50,7 +50,7 @@ pnpm --filter=app install typescript -D
     - 'packages/*'
   ```
 
-- 然后在根目录下创建 `packages` 目录 <font color="red">（注意：名称要与上面配置的 `packages/*` 目录名称一致）</font
+- 然后在根目录下创建 `packages` 目录 <font color="red">（注意：名称要与上面配置的 `packages/*` 目录名称一致）</font>
 
 ### 进入 `packages` 创建主应用 `app`
 
@@ -85,7 +85,7 @@ pnpm --filter=app install typescript -D
   }
   ```
 
-### 进入 `packages` 创建子应用`demo1`, `demo2`
+### 进入 `packages` 创建子应用 `demo1`, `demo2`
 
 - 依次执行下面命令(这里只演示 `demo1`, `demo2` 创建同下)
 
