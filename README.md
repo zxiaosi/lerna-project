@@ -601,7 +601,7 @@ npm install typescript -D --workspace=app
 
 {% endnote %}
 
-- 在 `demo2` 项目中安装 [vite-plugin-qiankun](https://github.com/zxiaosi/lerna-project/tree/lerna6-npm-workspaces-vite/)
+- 在 `demo2` 项目中安装 [vite-plugin-qiankun](https://www.npmjs.com/package/vite-plugin-qiankun)
 
   ```bash
   # 在根目录下执行
