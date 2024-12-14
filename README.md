@@ -168,7 +168,7 @@ npm install typescript -D --workspace=app
   npm i qiankun -w=app
   ```
 
-- [文件目录结构](https://github.com/zxiaosi/lerna-project/tree/lerna8-pnpm-workspaces-vite/)
+- [文件目录结构](https://github.com/zxiaosi/lerna-project/tree/lerna6-npm-workspaces-vite/)
 
   ```bash
    ├── public
@@ -406,4 +406,338 @@ npm install typescript -D --workspace=app
 
   /** 注册子应用 */
   registerMicroApps(microApps);
+  ```
+
+### 配置子应用 `demo1`
+
+{% note danger no-icon %}
+
+`node` 版本小于 `18`, 安装 `vite-plugin-qiankun` 后启动会报错 `ReferenceError: ReadableStream is not defined`
+
+解决方案：更改 `cheerio` 的版本, 详见：[cheerio upgrade problem](https://github.com/cheeriojs/cheerio/issues/3993#issuecomment-2283505868)
+
+在 `demo1/package.json` 下添加下面内容 <font>注意不要带 ^ 符号</font>
+
+```bash
+{
+  ... // 其他配置
+  "devDependencies": {
+    ... // 其他依赖
+    "cheerio": "1.0.0-rc.12"
+  }
+}
+```
+
+最后删除 `node_modules` 文件夹与 `package-lock.json` 文件，重新安装依赖 <font>(重要！！！)</font>
+
+{% endnote %}
+
+- 在 `demo1` 项目中安装 [vite-plugin-qiankun](https://www.npmjs.com/package/vite-plugin-qiankun)
+
+  ```bash
+  # 在根目录下执行
+  npm i vite-plugin-qiankun -w=demo1
+  ```
+
+- [文件目录结构](https://github.com/zxiaosi/lerna-project/tree/lerna6-npm-workspaces-vite/)
+
+  ```bash
+   ├── public
+   ├── src
+      ├── router
+        ├── index.tsx
+      ├── App.tsx
+      ├── index.css
+      ├── main.tsx
+   ├── vite.config.ts
+  ```
+
+- 修改 `packages/app/src/router/index.tsx` 文件内容如下
+
+  ```typescript
+  import { createBrowserRouter } from 'react-router-dom';
+
+  /** 路由配置 */
+  const router = createBrowserRouter([
+    {
+      path: '/demo1/temp1',
+      element: <>temp1</>,
+    },
+    {
+      path: '/demo1/temp2',
+      element: <>temp2</>,
+    },
+  ]);
+
+  export default router;
+  ```
+
+- 修改 `packages/app/src/App.tsx` 文件内容如下
+
+  ```typescript
+  import router from './router';
+  import { RouterProvider } from 'react-router-dom';
+
+  function App() {
+    return (
+      <>
+        <h1>子应用 demo1</h1>
+        <RouterProvider router={router} />
+      </>
+    );
+  }
+
+  export default App;
+  ```
+
+- 修改 `packages/app/src/index.css` 文件内容如下
+
+  ```css
+  body {
+    margin: 0;
+    padding: 0;
+  }
+  ```
+
+- 修改 `packages/app/src/main.tsx` 文件内容如下
+
+  ```typescript
+  import { StrictMode } from 'react';
+  import { createRoot } from 'react-dom/client';
+  import App from './App.tsx';
+  import './index.css';
+  import { QiankunProps, renderWithQiankun, qiankunWindow } from 'vite-plugin-qiankun/dist/helper';
+
+  /** 渲染函数 */
+  const render = (container?: HTMLElement) => {
+    const app = container || (document.getElementById('root') as HTMLDivElement);
+    createRoot(app).render(
+      <StrictMode>
+        <App />
+      </StrictMode>
+    );
+  };
+
+  /** Qiankun 生命周期钩子 */
+  const qiankun = () => {
+    renderWithQiankun({
+      bootstrap() {
+        console.warn('App bootstrap');
+      },
+      async mount(props: QiankunProps) {
+        console.warn('App mount');
+        render(props.container);
+      },
+      update: (props: QiankunProps) => {
+        console.warn('App update', props);
+      },
+      unmount: (props: QiankunProps) => {
+        console.warn('App unmount', props);
+      },
+    });
+  };
+
+  // 检查是否在 Qiankun 环境中
+  console.log('qiankunWindow', qiankunWindow.__POWERED_BY_QIANKUN__);
+
+  if (qiankunWindow.__POWERED_BY_QIANKUN__) qiankun();
+  else render();
+  ```
+
+- 修改 `packages/demo1/vite.config.ts` 文件内容如下
+
+  ```typescript
+  import { defineConfig } from 'vite';
+  import react from '@vitejs/plugin-react-swc';
+  import qiankun from 'vite-plugin-qiankun';
+
+  // https://vitejs.dev/config/
+  // https://cloud.tencent.com/developer/article/2138139
+  export default ({ mode }) => {
+    const useDevMode = mode === 'development';
+    const host = '127.0.0.1';
+    const port = 8001;
+    const subAppName = 'demo1';
+    const base = useDevMode ? `http://${host}:${port}/${subAppName}` : `/${subAppName}`;
+
+    return defineConfig({
+      base,
+      server: {
+        port,
+        cors: true, // 作为子应用时，如果不配置，则会引起跨域问题
+        origin: `http://${host}:${port}`, // 必须配置，否则无法访问静态资源
+      },
+      plugins: [
+        // 在开发模式下需要把react()关掉
+        // https://github.com/tengmaoqing/vite-plugin-qiankun?tab=readme-ov-file#3dev%E4%B8%8B%E4%BD%9C%E4%B8%BA%E5%AD%90%E5%BA%94%E7%94%A8%E8%B0%83%E8%AF%95
+        ...[useDevMode ? [] : [react()]],
+        qiankun(subAppName, { useDevMode }),
+      ],
+    });
+  };
+  ```
+
+### 配置子应用 `demo2`
+
+{% note danger no-icon %}
+
+`node` 版本小于 `18`, 安装 `vite-plugin-qiankun` 后启动会报错 `ReferenceError: ReadableStream is not defined`
+
+解决方案：更改 `cheerio` 的版本, 详见：[cheerio upgrade problem](https://github.com/cheeriojs/cheerio/issues/3993#issuecomment-2283505868)
+
+在 `demo2/package.json` 下添加下面内容 <font>注意不要带 ^ 符号</font>
+
+```bash
+{
+  ... // 其他配置
+  "devDependencies": {
+    ... // 其他依赖
+    "cheerio": "1.0.0-rc.12"
+  }
+}
+```
+
+最后删除 `node_modules` 文件夹与 `package-lock.json` 文件，重新安装依赖 <font>(重要！！！)</font>
+
+{% endnote %}
+
+- 在 `demo2` 项目中安装 [vite-plugin-qiankun](https://github.com/zxiaosi/lerna-project/tree/lerna6-npm-workspaces-vite/)
+
+  ```bash
+  # 在根目录下执行
+  npm i vite-plugin-qiankun -w=demo2
+  ```
+
+- [文件目录结构](https://github.com/zxiaosi/lerna-project/tree/lerna6-npm-workspaces-vite/)
+
+  ```bash
+   ├── public
+   ├── src
+      ├── router
+        ├── index.tsx
+      ├── App.tsx
+      ├── index.css
+      ├── main.tsx
+   ├── vite.config.ts
+  ```
+
+- 修改 `packages/app/src/router/index.tsx` 文件内容如下
+
+  ```typescript
+  import { createBrowserRouter } from 'react-router-dom';
+
+  /** 路由配置 */
+  const router = createBrowserRouter([
+    {
+      path: '/demo2',
+      element: <>demo2</>,
+    },
+  ]);
+
+  export default router;
+  ```
+
+- 修改 `packages/app/src/App.tsx` 文件内容如下
+
+  ```typescript
+  import router from './router';
+  import { RouterProvider } from 'react-router-dom';
+
+  function App() {
+    return (
+      <>
+        <h1>子应用 demo2</h1>
+        <RouterProvider router={router} />
+      </>
+    );
+  }
+
+  export default App;
+  ```
+
+- 修改 `packages/app/src/index.css` 文件内容如下
+
+  ```css
+  body {
+    margin: 0;
+    padding: 0;
+  }
+  ```
+
+- 修改 `packages/app/src/main.tsx` 文件内容如下
+
+  ```typescript
+  import { StrictMode } from 'react';
+  import { createRoot } from 'react-dom/client';
+  import App from './App.tsx';
+  import './index.css';
+  import { QiankunProps, renderWithQiankun, qiankunWindow } from 'vite-plugin-qiankun/dist/helper';
+
+  /** 渲染函数 */
+  const render = (container?: HTMLElement) => {
+    const app = container || (document.getElementById('root') as HTMLDivElement);
+    createRoot(app).render(
+      <StrictMode>
+        <App />
+      </StrictMode>
+    );
+  };
+
+  /** Qiankun 生命周期钩子 */
+  const qiankun = () => {
+    renderWithQiankun({
+      bootstrap() {
+        console.warn('App bootstrap');
+      },
+      async mount(props: QiankunProps) {
+        console.warn('App mount');
+        render(props.container);
+      },
+      update: (props: QiankunProps) => {
+        console.warn('App update', props);
+      },
+      unmount: (props: QiankunProps) => {
+        console.warn('App unmount', props);
+      },
+    });
+  };
+
+  // 检查是否在 Qiankun 环境中
+  console.log('qiankunWindow', qiankunWindow.__POWERED_BY_QIANKUN__);
+
+  if (qiankunWindow.__POWERED_BY_QIANKUN__) qiankun();
+  else render();
+  ```
+
+- 修改 `packages/demo2/vite.config.ts` 文件内容如下
+
+  ```typescript
+  import { defineConfig } from 'vite';
+  import react from '@vitejs/plugin-react-swc';
+  import qiankun from 'vite-plugin-qiankun';
+
+  // https://vitejs.dev/config/
+  // https://cloud.tencent.com/developer/article/2138139
+  export default ({ mode }) => {
+    const useDevMode = mode === 'development';
+    const host = '127.0.0.1';
+    const port = 8002;
+    const subAppName = 'demo2';
+    const base = useDevMode ? `http://${host}:${port}/${subAppName}` : `/${subAppName}`;
+
+    return defineConfig({
+      base,
+      server: {
+        port,
+        cors: true, // 作为子应用时，如果不配置，则会引起跨域问题
+        origin: `http://${host}:${port}`, // 必须配置，否则无法访问静态资源
+      },
+      plugins: [
+        // 在开发模式下需要把react()关掉
+        // https://github.com/tengmaoqing/vite-plugin-qiankun?tab=readme-ov-file#3dev%E4%B8%8B%E4%BD%9C%E4%B8%BA%E5%AD%90%E5%BA%94%E7%94%A8%E8%B0%83%E8%AF%95
+        ...[useDevMode ? [] : [react()]],
+        qiankun(subAppName, { useDevMode }),
+      ],
+    });
+  };
   ```
