@@ -62,7 +62,7 @@ pnpm --filter=app install typescript -D
     - 'packages/*'
   ```
 
-- 然后在根目录下创建 `packages` 目录 <font color="red">（注意：名称要与上面配置的 `packages/*` 目录名称一致）</font
+- 然后在根目录下创建 `packages` 目录 <font color="red">（注意：名称要与上面配置的 `packages/*` 目录名称一致）</font>
 
 ### 进入 `packages` 创建主应用 `app`
 
@@ -107,7 +107,7 @@ pnpm --filter=app install typescript -D
   # 进入 packages 目录
   cd ./packages
 
-  # 创建主应用 app
+  # 创建子应用 demo1
   pnpm create vite
 
   # Project name
@@ -142,7 +142,7 @@ pnpm --filter=app install typescript -D
   # 进入 packages 目录
   cd ./packages
 
-  # 创建主应用 app
+  # 创建子应用 demo2
   pnpm create vite
 
   # Project name
@@ -158,7 +158,7 @@ pnpm --filter=app install typescript -D
   TypeScript + SWC
   ```
 
-- 在 `packages/demo1/vite.config.ts` 文件中配置端口号
+- 在 `packages/demo2/vite.config.ts` 文件中配置端口号
 
   ```typescript
   export default defineConfig({
@@ -433,6 +433,28 @@ pnpm --filter=app install typescript -D
 
 ### 配置子应用 `demo1`
 
+{% note danger no-icon %}
+
+`node` 版本小于 `18`, 安装 `vite-plugin-qiankun` 后启动会报错 `ReferenceError: ReadableStream is not defined`
+
+解决方案：更改 `cheerio` 的版本, 详见：[cheerio upgrade problem](https://github.com/cheeriojs/cheerio/issues/3993#issuecomment-2283505868)
+
+在 `demo1/package.json` 下添加下面内容 <font>注意不要带 ^ 符号</font>
+
+```bash
+{
+  ... // 其他配置
+  "devDependencies": {
+    ... // 其他依赖
+    "cheerio": "1.0.0-rc.12"
+  }
+}
+```
+
+最后删除 `node_modules` 文件夹与 `package-lock.json` 文件，重新安装依赖 <font>(重要！！！)</font>
+
+{% endnote %}
+
 - 在 `demo1` 项目中安装 [vite-plugin-qiankun](https://www.npmjs.com/package/vite-plugin-qiankun)
 
   ```bash
@@ -580,6 +602,28 @@ pnpm --filter=app install typescript -D
 
 ### 配置子应用 `demo2`
 
+{% note danger no-icon %}
+
+`node` 版本小于 `18`, 安装 `vite-plugin-qiankun` 后启动会报错 `ReferenceError: ReadableStream is not defined`
+
+解决方案：更改 `cheerio` 的版本, 详见：[cheerio upgrade problem](https://github.com/cheeriojs/cheerio/issues/3993#issuecomment-2283505868)
+
+在 `demo2/package.json` 下添加下面内容 <font>注意不要带 ^ 符号</font>
+
+```bash
+{
+  ... // 其他配置
+  "devDependencies": {
+    ... // 其他依赖
+    "cheerio": "1.0.0-rc.12"
+  }
+}
+```
+
+最后删除 `node_modules` 文件夹与 `package-lock.json` 文件，重新安装依赖 <font>(重要！！！)</font>
+
+{% endnote %}
+
 - 在 `demo2` 项目中安装 [vite-plugin-qiankun](https://www.npmjs.com/package/vite-plugin-qiankun)
 
   ```bash
@@ -688,7 +732,7 @@ pnpm --filter=app install typescript -D
   else render();
   ```
 
-- 修改 `packages/demo1/vite.config.ts` 文件内容如下
+- 修改 `packages/demo2/vite.config.ts` 文件内容如下
 
   ```typescript
   import { defineConfig } from 'vite';
