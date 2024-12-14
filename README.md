@@ -4,14 +4,10 @@
 
 - 详见 [lerna 多包项目](https://zxiaosi.com/archives/6f5a7b9a.html)
 
-### [lerna8 + npm + workspaces + umi](https://gitee.com/zxiaosi/lerna-project/tree/lerna8-npm-workspaces-umi/)
+### [lerna8 + npm + workspaces + umi](https://github.com/zxiaosi/lerna-project/tree/lerna8-npm-workspaces-umi/)
 
-### [lerna8 + yarn4 + workspaces + umi](https://gitee.com/zxiaosi/lerna-project/tree/lerna8-yarn4-workspaces-umi/)
+### [lerna8 + pnpm + workspaces + umi](https://github.com/zxiaosi/lerna-project/tree/lerna8-pnpm-workspaces-umi/)
 
-### [lerna8 + pnpm + workspaces + umi](https://gitee.com/zxiaosi/lerna-project/tree/lerna8-pnpm-workspaces-umi/)
+### [lerna8 + pnpm + workspaces + vite](https://github.com/zxiaosi/lerna-project/tree/lerna8-pnpm-workspaces-vite/)
 
-### [lerna8 + pnpm + workspaces + vite](https://gitee.com/zxiaosi/lerna-project/tree/lerna8-pnpm-workspaces-vite/)
-
-### [lerna6 + npm + workspaces + vite](https://gitee.com/zxiaosi/lerna-project/tree/lerna6-npm-workspaces-vite/)
-
-### [lerna6 + yarn + workspaces + vite](https://gitee.com/zxiaosi/lerna-project/tree/lerna6-yarn-workspaces-vite/)
+### [lerna6 + npm + workspaces + vite](https://github.com/zxiaosi/lerna-project/tree/lerna6-npm-workspaces-vite/)
