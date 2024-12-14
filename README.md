@@ -37,7 +37,8 @@ npm install typescript -D --workspace=app
   ```json
   {
     "npmClient": "npm",
-    "packages": ["packages/*"]
+    "packages": ["packages/*"],
+    ... // 其他配置
   }
   ```
 
@@ -49,7 +50,7 @@ npm install typescript -D --workspace=app
   }
   ```
 
-- 然后在根目录下创建 `packages` 目录 <font color="red">（注意：名称要与上面配置的 `packages/*` 目录名称一致）</font
+- 然后在根目录下创建 `packages` 目录 <font color="red">（注意：名称要与上面配置的 `packages/*` 目录名称一致）</font>
 
 ### 注意：`packages` 下的项目中每个包的 `package.json` 都要配置 `name`，否则会报错
 
@@ -86,7 +87,7 @@ npm install typescript -D --workspace=app
   }
   ```
 
-### 进入 `packages` 创建子应用`demo1`, `demo2`
+### 进入 `packages` 创建子应用 `demo1`, `demo2`
 
 - 依次执行下面命令(这里只演示 `demo1`, `demo2` 创建同下)
 
@@ -121,7 +122,7 @@ npm install typescript -D --workspace=app
 
 ### 设置应用的启动端口
 
-- 安装 `cross-env` 包
+- 在根目录下安装 `cross-env` 包 (不是项目根目录)
 
   ```bash
   npm i cross-env -D -w=app -w=demo1 -w=demo2
