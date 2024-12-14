@@ -95,7 +95,7 @@ npm install typescript -D --workspace=app
   # 进入 packages 目录
   cd ./packages
 
-  # 创建主应用 app
+  # 创建子应用 demo1
   npx create-umi@latest
 
   # What's the target folder name?
