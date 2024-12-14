@@ -158,3 +158,252 @@ npm install typescript -D --workspace=app
   # 在根目录下安装antd与react-router-dom
   npm i antd react-router-dom -w=app -w=demo1 -w=demo2
   ```
+
+### 配置主应用
+
+- 在 `app` 项目中安装 [qiankun](https://qiankun.umijs.org/zh/guide)
+
+  ```bash
+  # 根目录下执行
+  npm i qiankun -w=app
+  ```
+
+- [文件目录结构](https://github.com/zxiaosi/lerna-project/tree/lerna8-pnpm-workspaces-vite/)
+
+  ```bash
+   ├── public
+   ├── src
+      ├── layout
+        ├── index.tsx
+        ├── microApp.tsx
+      ├── router
+        ├── index.tsx
+      ├── App.tsx
+      ├── index.css
+      ├── main.tsx
+   ├── vite.config.ts
+  ```
+
+- 修改 `packages/app/src/layout/microApp.tsx` 文件内容如下
+
+  ```typescript
+  import { start } from 'qiankun';
+  import { useEffect } from 'react';
+
+  const MicroApp = () => {
+    /** 加载子应用 */
+    const handleLoadMicroApp = () => {
+      if (!window.qiankunStarted) {
+        window.qiankunStarted = true;
+        start();
+      }
+    };
+
+    useEffect(() => {
+      handleLoadMicroApp();
+    }, []);
+
+    return (
+      <div>
+        <div id="subapp"></div>
+      </div>
+    );
+  };
+
+  export default MicroApp;
+  ```
+
+- 修改 `packages/app/src/layout/index.tsx` 文件内容如下
+
+  ```typescript
+  import React, { useState } from 'react';
+  import { Layout, Menu } from 'antd';
+  import { Outlet, useNavigate } from 'react-router-dom';
+  const { Header, Content, Footer, Sider } = Layout;
+  import MicroApp from './microApp';
+
+  /** 菜单栏配置 */
+  const menus = [
+    { key: 'home', label: 'Home', meta: { path: '/home' } },
+    {
+      key: 'docs',
+      label: 'Docs',
+      children: [
+        { key: 'test1', label: 'Test1', meta: { path: '/docs/test1' } },
+        { key: 'test2', label: 'Test2', meta: { path: '/docs/test2' } },
+      ],
+    },
+    {
+      key: 'demo1',
+      label: 'Demo1',
+      children: [
+        { key: 'temp1', label: 'Temp1', meta: { path: '/demo1/temp1' } },
+        { key: 'temp2', label: 'Temp2', meta: { path: '/demo1/temp2' } },
+      ],
+    },
+    {
+      key: 'demo2',
+      label: 'Demo2',
+      meta: { path: '/demo2' },
+    },
+  ];
+
+  const App: React.FC = () => {
+    const navigate = useNavigate();
+
+    const [selectedKeys, setSelectedKeys] = useState<string[]>(['home']); // 控制菜单栏的选中状态
+
+    /** 菜单栏点击事件 */
+    const handleClick = (e: any) => {
+      setSelectedKeys([e.key]);
+      navigate(e?.item?.props?.meta?.path);
+    };
+
+    return (
+      <Layout style={{ minHeight: '100vh' }}>
+        <Sider>
+          <Menu theme="dark" selectedKeys={selectedKeys} mode="inline" items={menus} onClick={handleClick} />
+        </Sider>
+
+        <Layout>
+          <Header style={{ padding: 0, background: '#fff' }} />
+          <Content style={{ margin: '0 16px' }}>
+            <div
+              style={{
+                padding: 24,
+                minHeight: 360,
+                background: '#fff',
+                borderRadius: 16,
+                margin: '16px 0',
+              }}>
+              {/* 这里渲染子路由 */}
+              <Outlet />
+              {/* 这里挂载微应用 */}
+              <MicroApp />
+            </div>
+          </Content>
+          <Footer style={{ textAlign: 'center' }}>zxiaosi ©{new Date().getFullYear()}</Footer>
+        </Layout>
+      </Layout>
+    );
+  };
+
+  export default App;
+  ```
+
+- 修改 `packages/app/src/router/index.tsx` 文件内容如下
+
+  ```typescript
+  import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
+  import BaseLayout from '../layout/index';
+
+  /** 路由配置 */
+  const router = createBrowserRouter([
+    {
+      path: '/',
+      element: <Navigate to="/home" replace={true} />, // 重定向
+    },
+    {
+      path: '/',
+      element: <BaseLayout />,
+      errorElement: <>BaseLayout Error</>,
+      children: [
+        {
+          path: '/home',
+          element: <>主应用 Home</>,
+        },
+        {
+          path: '/docs',
+          element: <Outlet />,
+          children: [
+            { path: '/docs/test1', element: <>主应用 Docs Test1</> },
+            { path: '/docs/test2', element: <>主应用 Docs Test2</> },
+          ],
+        },
+        {
+          path: '/demo1',
+          element: <Navigate to="/demo1/temp1" replace={true} />,
+          errorElement: <>子应用 demo1 Error</>,
+          children: [
+            {
+              path: '/demo1/temp1',
+              element: <></>,
+            },
+            {
+              path: '/demo1/temp2',
+              element: <></>,
+            },
+          ],
+        },
+        {
+          path: '/demo2',
+          element: <></>,
+          errorElement: <>子应用 demo2 Error</>,
+        },
+      ],
+    },
+    {
+      path: '/login',
+      element: <>Login</>,
+    },
+  ]);
+
+  export default router;
+  ```
+
+- 修改 `packages/app/src/App.tsx` 文件内容如下
+
+  ```typescript
+  import router from './router';
+  import { RouterProvider } from 'react-router-dom';
+
+  function App() {
+    return <RouterProvider router={router} />;
+  }
+
+  export default App;
+  ```
+
+- 修改 `packages/app/src/index.css` 文件内容如下
+
+  ```css
+  body {
+    margin: 0;
+    padding: 0;
+  }
+  ```
+
+- 修改 `packages/app/src/main.tsx` 文件内容如下
+
+  ```typescript
+  import { StrictMode } from 'react';
+  import { createRoot } from 'react-dom/client';
+  import App from './App.tsx';
+  import './index.css';
+  import { registerMicroApps, RegistrableApp } from 'qiankun';
+
+  createRoot(document.getElementById('root')!).render(
+    <StrictMode>
+      <App />
+    </StrictMode>
+  );
+
+  /** 子应用配置 */
+  const microApps: Array<RegistrableApp<any>> = [
+    {
+      name: 'demo1',
+      entry: '//localhost:8001',
+      container: '#subapp', // 子应用挂载的容器
+      activeRule: '/demo1',
+    },
+    {
+      name: 'demo2',
+      entry: '//localhost:8002',
+      container: '#subapp', // 子应用挂载的容器
+      activeRule: '/demo2',
+    },
+  ];
+
+  /** 注册子应用 */
+  registerMicroApps(microApps);
+  ```
