@@ -4,6 +4,14 @@
   "workspaces": [
     "packages/*"
   ],
+  "scripts": {
+    "app": "npm run dev -w=app",
+    "bootstrap": "lerna bootstrap",
+    "clean": "lerna clean && rimraf ./node_modules",
+    "demo1": "npm run dev -w=demo1",
+    "demo2": "npm run dev -w=demo2",
+    "preinstall": "npx only-allow npm"
+  },
   "devDependencies": {
     "lerna": "^6.5.1"
   }

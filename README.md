@@ -741,3 +741,41 @@ npm install typescript -D --workspace=app
     });
   };
   ```
+
+### [更多微前端配置](https://qiankun.umijs.org/zh/guide)
+
+### 添加快捷命令
+
+```json
+  {
+    "scripts": {
+      "app": "npm run dev -w=app",
+      "bootstrap": "lerna bootstrap",
+      "clean": "lerna clean && rimraf ./node_modules",
+      "demo1": "npm run dev -w=demo1",
+      "demo2": "npm run dev -w=demo2",
+      "preinstall": "npx only-allow npm"
+    },
+    ... // 其他配置
+  }
+```
+
+- 使用
+
+  ```bash
+  # 安装包
+  npm install
+  npm run bootstrap
+
+  # 启动主应用
+  npm run app
+
+  # 启动子应用
+  npm run demo1
+
+  # 启动子应用
+  npm run demo2
+
+  # 清空依赖
+  npm run clean
+  ```
