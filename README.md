@@ -145,3 +145,16 @@ npm install typescript -D --workspace=app
     ... // 其他配置
   });
   ```
+
+### 安装所需依赖
+
+- 删除根目录下的 `node_modules` 文件夹与 `package-lock.json` 文件
+
+- 在根目录下运行 `npm install` 安装依赖
+
+- 给 `app`、`demo`、`demo2` 安装所需的包 <font color="red">（这里可以将公用的包提取到 npm 仓库，然后在各个项目中安装, 这里不做演示）</font>
+
+  ```bash
+  # 在根目录下安装antd与react-router-dom
+  npm i antd react-router-dom -w=app -w=demo1 -w=demo2
+  ```
